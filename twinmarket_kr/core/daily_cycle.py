@@ -8,6 +8,7 @@ from twinmarket_kr.agents.fundamental_agent import FundamentalAgent
 from twinmarket_kr.agents.memory_agent import MemoryAgent
 from twinmarket_kr.agents.news_agent import NewsAgent
 from twinmarket_kr.core.collect_context import collect_context
+from twinmarket_kr.llm.analysis import analyze_market, interpret_news
 from twinmarket_kr.llm.belief import update_belief
 from twinmarket_kr.llm.client import OpenRouterClient
 from twinmarket_kr.llm.decision import build_trading_constraints, make_decision
@@ -43,6 +44,12 @@ async def run_agent_turn(
         fundamental_agent=fundamental_agent,
         news_agent=news_agent,
     )
+    news_interpretation = await interpret_news(
+        agent,
+        today_context["news_context"],
+        client=client,
+    )
+    today_context["news_interpretation"] = news_interpretation
     today_belief = await update_belief(
         agent,
         today_context,
@@ -56,9 +63,18 @@ async def run_agent_turn(
         current_quantity=current_quantity,
         current_price=current_price,
     )
+    market_analysis = await analyze_market(
+        agent,
+        today_belief=today_belief,
+        market_features=today_context["market_features"],
+        portfolio_summary=today_context["portfolio_summary"],
+        news_interpretation=news_interpretation,
+        client=client,
+    )
     decision = await make_decision(
         agent,
         today_belief,
+        market_analysis,
         today_context["portfolio_summary"],
         constraints,
         client=client,
