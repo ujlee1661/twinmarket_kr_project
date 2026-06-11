@@ -16,6 +16,11 @@ LLM 기반 에이전트 100명이 삼성전자(005930) 단일 종목을 거래�
 - 시뮬레이션 재실행 시 `sim.db`의 런타임 테이블을 정리하고, 체결 결과 기준으로 `trade_log` 상태를 갱신하도록 수정했다.
 - 시뮬레이션 로그는 실행마다 `outputs/logs/current`로 새로 작성되며 이전 로그 폴더는 정리된다.
 
+## 변경 기록 (2026-06-11)
+
+- Depth 2 에이전트는 `search_needed` 판단값과 무관하게 `depth2_search_keywords`에 해당하는 `search_keywords`가 있으면 항상 최근 7일 뉴스 풀에서 추가 검색을 수행하도록 수정했다.
+- `prompts/news_agent.txt`에서 Depth 2 추가 검색을 선택 행동이 아닌 기본 행동으로 명시하고, `search_needed=false`인 경우에도 검색 키워드 3~8개를 반드시 생성하도록 안내했다.
+- `depth2_flow.step2_pre_search_thinking.search_needed`는 검색 실행 제어값이 아니라 판단 기록용 필드로 유지된다.
 ---
 
 ## 추가된 파일 (2026-06-02)
